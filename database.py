@@ -10,10 +10,15 @@ db_pool = None
 # === Databasega ulanish ===
 async def init_db():
     global db_pool
+    # --------------------------------------------------------------------------------
+    # 💡 ӨЗГЕРІС: 'timeout=60.0' қосылу уақытын арттыру үшін қосылды.
+    #    (Бұл Render-дегі немесе Supabase-тегі баяу қосылымдар үшін қажет)
+    # --------------------------------------------------------------------------------
     db_pool = await asyncpg.create_pool(
         dsn=os.getenv("DATABASE_URL"),  # faqat URL orqali ulanish
         ssl="require",
-        statement_cache_size=0
+        statement_cache_size=0,
+        timeout=60.0 # 60 секундқа дейін күту
     )
 
     async with db_pool.acquire() as conn:
@@ -53,7 +58,7 @@ async def init_db():
         """)
 
         # Dastlabki adminlar (o‘zingning ID’laringni yoz)
-        default_admins = [6486825926]
+        default_admins = [7483732504, 5959511392]
         for admin_id in default_admins:
             await conn.execute(
                 "INSERT INTO admins (user_id) VALUES ($1) ON CONFLICT DO NOTHING",
