@@ -18,7 +18,7 @@ async def init_db():
         dsn=os.getenv("DATABASE_URL"),  # faqat URL orqali ulanish
         ssl="require",
         statement_cache_size=0,
-        timeout=60.0 # 60 секундқа дейін күту
+        timeout=180.0 # 180 секундқа дейін күту
     )
 
     async with db_pool.acquire() as conn:
