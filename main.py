@@ -871,28 +871,40 @@ async def download_all(callback: types.CallbackQuery):
     result = await get_kino_by_code(code)
     if not result:
         await callback.message.answer("❌ Kod topilmadi.")
+        await callback.answer()
         return
 
     channel, base_id, post_count = result["channel"], result["message_id"], result["post_count"]
 
     await callback.answer("⏳ Yuklanmoqda, biroz kuting...")
 
+    # Пайдаланушының админ екенін тексереміз
+    user_is_admin = callback.from_user.id in ADMINS
+    
+    sent_count = 0
     # Hamma qismlarni ketma-ket yuborish
     for i in range(post_count):
         try:
-             # ОСЫ ЖЕРГЕ ӨЗГЕРІС ЕНГІЗІЛДІ
             await bot.copy_message(
                 chat_id=callback.from_user.id,
                 from_chat_id=channel,
                 message_id=base_id + i,
-                # Егер пайдаланушы админ БОЛМАСА, контентті қорғаймыз
-        protect_content=not user_is_admin
-                ) 
-                # ОСЫ ЖЕР ӨЗГЕРТІЛДІ
-            await asyncio.sleep(0.3)  # flood control uchun tezroq yuborish
-        except:
-            pass
-
+                protect_content=not user_is_admin
+            )
+            sent_count += 1
+            await asyncio.sleep(0.3)
+        except Exception as e:
+            # Қатені консольға шығарамыз (replit немесе серверде көрінеді)
+            print(f"ERROR sending video: {e}")
+            # Пайдаланушыға қате туралы хабарлаймыз
+            await callback.message.answer(f"❌ {i+1}-бөлімді жіберу мүмкін болмады.\n"
+                                          f"Себебі: {e}\n\n"
+                                          f"Админмен хабарласыңыз.")
+            # Егер бір қате шықса, циклды тоқтатамыз
+            break 
+    
+    if sent_count > 0 and sent_count < post_count:
+        await callback.message.answer(f"✅ {sent_count} бөлім сәтті жіберілді, бірақ процесс үзілді.")
 
 # === START ===
 async def on_startup(dp):
