@@ -880,10 +880,19 @@ async def download_all(callback: types.CallbackQuery):
     # Hamma qismlarni ketma-ket yuborish
     for i in range(post_count):
         try:
-            await bot.copy_message(callback.from_user.id, channel, base_id + i)
-            await asyncio.sleep(0.5)  # flood control uchun sekin yuborish
+             # ОСЫ ЖЕРГЕ ӨЗГЕРІС ЕНГІЗІЛДІ
+            await bot.copy_message(
+                chat_id=callback.from_user.id,
+                from_chat_id=channel,
+                message_id=base_id + i,
+                # Егер пайдаланушы админ БОЛМАСА, контентті қорғаймыз
+        protect_content=not user_is_admin
+                ) 
+                # ОСЫ ЖЕР ӨЗГЕРТІЛДІ
+            await asyncio.sleep(0.3)  # flood control uchun tezroq yuborish
         except:
             pass
+
 
 # === START ===
 async def on_startup(dp):
