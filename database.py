@@ -10,17 +10,18 @@ db_pool = None
 # === Databasega ulanish ===
 async def init_db():
     global db_pool
-    # --------------------------------------------------------------------------------
-    # 💡 ӨЗГЕРІС: 'timeout=60.0' қосылу уақытын арттыру үшін қосылды.
-    #    (Бұл Render-дегі немесе Supabase-тегі баяу қосылымдар үшін қажет)
-    # --------------------------------------------------------------------------------
     db_pool = await asyncpg.create_pool(
         dsn=os.getenv("DATABASE_URL"),  # faqat URL orqali ulanish
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASS"),
+        database=os.getenv("DB_NAME"),
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT")),
         ssl="require",
-        statement_cache_size=0,
-        timeout=180.0 # 180 секундқа дейін күту
+        statement_cache_size=0
+        timeout=60.0 # 180 секундқа дейін күту
     )
-
+    
     async with db_pool.acquire() as conn:
         # === Foydalanuvchilar ===
         await conn.execute("""
