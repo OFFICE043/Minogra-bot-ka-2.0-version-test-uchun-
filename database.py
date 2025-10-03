@@ -18,7 +18,7 @@ async def init_db():
         host=os.getenv("DB_HOST"),
         port=int(os.getenv("DB_PORT")),
         ssl="require",
-        statement_cache_size=0
+        statement_cache_size=0,
         timeout=60.0 # 180 секундқа дейін күту
     )
     
